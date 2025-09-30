@@ -1,0 +1,261 @@
+---
+title: "Visualization"
+subtitle: "Part I"
+author: "Fenglin Xie"
+date: "2025-09-25"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(ggridges)
+library(p8105.datasets)
+```
+
+Import the weather data
+```{r}
+data("weather_df")
+```
+
+Making the first plot
+
+```{r}
+ggplot(data = weather_df, mapping = aes(x = tmin, y = tmax)) +
+  geom_point()
+```
+
+也可以这样
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) +
+  geom_point()
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point()
+```
+
+
+```{r}
+ggp_weather_scatterplot = 
+  weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point()
+
+ggp_weather_scatterplot
+```
+
+check that some rows are missing.
+
+```{r}
+weather_df |> 
+  filter(is.na(tmax))
+```
+
+
+## Fancier scatterplot!
+
+##smooth得出来的error bound基本不可信，所以用se = FALSE去掉它
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(se = FALSE)
+```
+
+
+where you define aesthetics can matter 
+
+##没听懂？？？
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(color = name, size = prcp), alpha = 0.3) +
+  geom_smooth(se = FALSE)
+```
+
+
+use faceting real quick
+
+row ~ column
+. ~ name :三列name
+name ~ . :三行name
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(color = name), alpha = 0.3, size = 0.3) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name)
+```
+
+
+Let's make a somewhat more interesting scatterplot
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name, shape = name)) +
+  geom_point(aes(size = prcp),alpha = 0.3) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name)
+```
+
+
+LA plot
+
+```{r}
+weather_df =
+  filter(name == "CentralPark_NY") |> 
+  mutate(
+    tmax_fahr = tmax * (9/5) + 32,
+    tmin_fahr = tmin * (9/5) + 32
+  ) |> 
+  ggplot(aes(x = tmin_fahr, y = tmax_fahr)) +
+   geom_point() +
+   geom_smooth(se = FALSE, method = "lm")
+```
+
+
+## Small thing
+
+换顺序会变换overlap的顺序：线在上--点在上
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name, shape = name)) +
+#  geom_point(alpha = 0.3) +
+  geom_smooth(se = FALSE)
+
+
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name, shape = name)) +
+  geom_smooth(se = FALSE) +
+  geom_point(alpha = 0.3)
+```
+```
+```
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex()
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(color = "purple")
+```
+
+##可以去网上查颜色编号
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(color = "#086bdf")
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin)) +
+  geom_histogram(color = "white", fill = "red")
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, colour = name)) +
+  geom_histogram()
+
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram()
+```
+overlapping is a problem somtimes--solve it
+maybe facet?
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram() +
+  facet_grid(name ~ .)
+```
+
+maybe a density plot?
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_density(alpha = 0.2)
+```
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmin)) +
+  geom_boxplot(aes(fill = name))
+```
+
+
+violin plots--symmetrical
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin()
+  
+```
+
+
+ridge plot
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = name, fill = name)) +
+  geom_density_ridges()
+```
+
+
+
+LA
+```{r}
+weather_df |> 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_density(alpha = 0.3)
+
+weather_df |> 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_histogram(alpha = 0.2) +
+  facet_grid(name ~ .)
+
+weather_df |> 
+  filter(prcp > 5, prcp < 1000) |> 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_density(alpha = 0.3)
+```
+
+## Saving and embedding plots
+
+saving plots
+```{r}
+ggp_weather_violin =
+  weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin()
+
+ggp_weather_violin
+
+ggsave("plots/violin_plot.pdf", ggp_weather_violin, width = 8, height = 6)
+
+
+```
+
+##补笔记
+embedding plots
+```{r}
+
+```
+

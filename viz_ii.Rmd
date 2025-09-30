@@ -1,0 +1,149 @@
+---
+title: "Visualization"
+sbutitle: "Part II"
+author: "Fenglin Xie"
+date: "2025-09-30"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(patchwork)
+library(p8105.datasets)
+```
+
+## load the weather data
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(colour = name), alpha = 0.5) +
+  labs(
+    x = "Minimum daily temp",
+    y = "Maximum daily temp",
+    title = "Temperature scatterplot",
+    caption = "Data from NOAA",
+    color = "Location"
+  )
+```
+
+
+## Scales
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(colour = name), alpha = 0.5) +
+  labs(
+    x = "Minimum daily temp",
+    y = "Maximum daily temp",
+    title = "Temperature scatterplot",
+    caption = "Data from NOAA",
+    color = "Location"
+  ) +
+  scale_x_continuous(
+    breaks = c(-20, 0, 25),
+    labels = c("-20C", "0", "25")
+  ) +
+  scale_y_continuous(
+    trans = "sqrt",
+    limits = c(10, 30)
+  )
+```
+
+限制范围limit另一种
+
+```{r}
+weather_df |> 
+  filter(tmax < 30, tmin > 10) |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(colour = name), alpha = 0.5) +
+  labs(
+    x = "Minimum daily temp",
+    y = "Maximum daily temp",
+    title = "Temperature scatterplot",
+    caption = "Data from NOAA",
+    color = "Location"
+  ) +
+  scale_x_continuous(
+    breaks = c(-20, 0, 25),
+    labels = c("-20C", "0", "25")
+  )
+```
+
+
+##挑选颜色很重要，颜色变化不明显不好
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(colour = name), alpha = 0.5) +
+  labs(
+    x = "Minimum daily temp",
+    y = "Maximum daily temp",
+    title = "Temperature scatterplot",
+    caption = "Data from NOAA",
+    color = "Location"
+  ) +
+  scale_x_continuous(
+    breaks = c(-20, 0, 25),
+    labels = c("-20C", "0", "25")
+  ) +
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  )
+```
+
+
+## Themes
+
+Make my base plot
+```{r}
+ggp_temperature =
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(colour = name), alpha = 0.5) +
+  labs(
+    x = "Minimum daily temp",
+    y = "Maximum daily temp",
+    title = "Temperature scatterplot",
+    caption = "Data from NOAA",
+    color = "Location"
+  ) +
+  scale_x_continuous(
+    breaks = c(-20, 0, 25),
+    labels = c("-20C", "0", "25")
+  ) +
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  )
+```
+
+update my base plot
+legend.position:图例位置
+
+themes_minimal:忘记之前所有的设计？？（不确定，再听一遍）
+```{r}
+ggp_temperature +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+
+## Adding data in geoms
+
+```{r}
+central_park_df =
+  weather_df |> 
+  filter(name == "CentralPark_NY")
+
+molokai_df =
+  weather_df |> 
+  filter(name == "Molokai_HI")
+
+ggplot(data = molokai_df, aes(x = date, y = tmax, colour = name)) +
+  geom_point() +
+  geom_line(data = central_park_df)
+```
+
