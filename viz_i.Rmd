@@ -64,6 +64,7 @@ weather_df |>
   ggplot(aes(x = tmin, y = tmax, color = name)) +
   geom_point(alpha = 0.3) +
   geom_smooth(se = FALSE)
+    
 ```
 
 
@@ -108,7 +109,7 @@ weather_df |>
 LA plot
 
 ```{r}
-weather_df =
+weather_df |> 
   filter(name == "CentralPark_NY") |> 
   mutate(
     tmax_fahr = tmax * (9/5) + 32,
