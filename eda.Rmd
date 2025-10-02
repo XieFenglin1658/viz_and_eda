@@ -1,0 +1,122 @@
+---
+title: "Exploratory Analysis"
+author: "Fenglin Xie"
+date: "2025-10-2"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(patchwork)
+library(p8105.datasets)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+## import the weather data
+
+```{r}
+data("weather_df")
+
+weather_df =
+  weather_df |> 
+  mutate(month = floor_date(date, "month"))
+
+```
+
+
+make plots
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = prcp)) +
+  geom_histogram()
+```
+
+check on extreme values
+
+##确认这些extreme value是不是真实有意义的
+
+```{r}
+weather_df |> 
+  filter(prcp > 1000)
+```
+
+
+look at data again
+
+```{r}
+weather_df |> 
+  filter(tmax >= 20, tmax<= 30) |> 
+  ggplot(aes(x = tmin, y = tmax, colour = name, shape = name)) +
+  geom_point()
+```
+
+
+add groups
+
+```{r}
+weather_df |>
+  group_by(name, month)
+```
+
+group and count thingd
+
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  summarize(
+    n = n()
+  )
+```
+
+
+```{r}
+weather_df |>
+  group_by(month) |> 
+  summarize(
+    n = n()
+  )
+```
+
+
+```{r}
+weather_df |>
+  group_by(name, month) |> 
+  summarize(
+    n = n()
+  )
+```
+
+
+```{r}
+weather_df |> 
+  group_by(month) |> 
+  summarize(
+    n = n_distinct(date)
+  )
+```
+
+
+You can count directly 
+
+```{r}
+weather_df |> 
+  count(name)
+```
+
+
